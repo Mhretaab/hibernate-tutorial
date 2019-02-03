@@ -2,7 +2,11 @@ package com.tutorial.hibernate.models;
 
 import org.hibernate.annotations.SortComparator;
 
+
 import javax.persistence.*;
+
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.Cascade;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
@@ -11,6 +15,7 @@ import java.util.TreeSet;
 @Entity
 @Table(name="honey", uniqueConstraints={@UniqueConstraint(columnNames={"id"})})
 @SequenceGenerator(name = "honey_seq", sequenceName = "honey_id_seq")//hibernate name and database name of seq generator
+@Access(value=AccessType.FIELD)
 public class Honey implements Serializable {
 
     private static final long serialVersionUID = 950600335439388061L;
@@ -19,7 +24,8 @@ public class Honey implements Serializable {
     private Integer id; //mandatory
     private String name;
     private String taste;
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)//(mappedBy="honey")
+    @OneToMany(cascade = {javax.persistence.CascadeType.PERSIST, javax.persistence.CascadeType.MERGE}, orphanRemoval = true)//(mappedBy="honey")
+    @Cascade({CascadeType.SAVE_UPDATE})
     @JoinColumn(name = "honey_id")
     @SortComparator(BeeComparator.class)
     private Set<Bee> bees = new TreeSet<>(new BeeComparator());;

@@ -43,7 +43,28 @@ public class Main {
         //entityManagerQuery();
 
         //createHoneyWithCurrentSession();
-        createHoneyBeeRelation();
+        //createHoneyBeeRelation();
+        getVsLoadDifference();
+    }
+
+    private static void getVsLoadDifference() {
+        Session session = HibernateSessionFactoryWithXml.getInstance().openSession();
+        Transaction tx = session.beginTransaction();
+        Honey h = (Honey)session.get(Honey.class, new Integer(250));
+        System.out.println(h.getName());
+        //Set<Bee> bees = h.getBees();
+        for(Bee b:h.getBees()){
+            System.out.println("bee name: " + b.getName());
+        }
+
+        Honey a = (Honey)session.load(Honey.class, new Integer(250));//returns proxy  object for lazy initialization
+        for(Bee b:a.getBees()){
+            System.out.println("bee name: " + b.getName());
+        }
+
+        tx.commit();
+        session.close();
+        HibernateSessionFactoryWithXml.getInstance().close();
     }
 
     private static void createHoneyBeeRelation() {
@@ -65,6 +86,8 @@ public class Main {
         b.setHoney(honey);
         a.setHoney(honey);
 
+        //session.save(b);
+        //session.save(a);
         session.save(honey);
         tx.commit();
         HibernateSessionFactoryWithXml.getInstance().close();
