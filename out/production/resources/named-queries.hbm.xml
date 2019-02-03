@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <query name="HQL_GET_ALL_HONEY">from Honey</query>
+
+    <query name="HQL_GET_HONEY_BY_ID">
+        <![CDATA[from Honey where id = :id]]>
+    </query>
+
+    <query name="HQL_GET_HONEY_BY_NAME">
+        <![CDATA[from Honey where name = :name]]>
+    </query>
+
+    <sql-query name="SQL_GET_ALL_HONEY">
+        <![CDATA[select id, name from honey]]>
+    </sql-query>
+
+    <sql-query name="SQL_GET_ALL_HONEY_BEES">
+        <![CDATA[select {h.*}, {b.*} from Honey h join Bee b ON h.id=b.honey_id]]>
+        <return alias="h" class="com.tutorial.hibernate.models.Honey" />
+        <return-join alias="b" property="h.bees"></return-join>
+    </sql-query>
+</hibernate-mapping>

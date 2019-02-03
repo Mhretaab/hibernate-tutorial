@@ -39,7 +39,7 @@
         <property name="hibernate.current_session_context_class">thread</property>
 
         <!--for test and development env-->
-        <property name="hibernate.show_sql">true</property>
+        <!--<property name="hibernate.show_sql">true</property>-->
 
         <!--create the table schema when the configuration is initialized-->
         <property name="hibernate.hbm2ddl.auto">update</property>
@@ -54,6 +54,7 @@
         <!--class to table mapping-->
         <mapping class="com.tutorial.hibernate.models.Honey" />
         <mapping class="com.tutorial.hibernate.models.Bee" />
+        <mapping resource="named-queries.hbm.xml" />
 
         <!-- mapping file, we can use Bean annotations too -->
         <!--<mapping resource="honey.hbm.xml"/>-->

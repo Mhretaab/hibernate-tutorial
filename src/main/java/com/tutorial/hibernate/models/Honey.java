@@ -1,12 +1,11 @@
 package com.tutorial.hibernate.models;
 
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.SortComparator;
 
 
 import javax.persistence.*;
 
-import org.hibernate.annotations.CascadeType;
-import org.hibernate.annotations.Cascade;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Set;
@@ -24,8 +23,9 @@ public class Honey implements Serializable {
     private Integer id; //mandatory
     private String name;
     private String taste;
-    @OneToMany(cascade = {javax.persistence.CascadeType.PERSIST, javax.persistence.CascadeType.MERGE}, orphanRemoval = true)//(mappedBy="honey")
-    @Cascade({CascadeType.SAVE_UPDATE})
+
+    @OneToMany(cascade = {CascadeType.PERSIST}, orphanRemoval = true)//(mappedBy="honey")
+    @Cascade({org.hibernate.annotations.CascadeType.SAVE_UPDATE})
     @JoinColumn(name = "honey_id")
     @SortComparator(BeeComparator.class)//not recommended for large set of data rather use hibernate criteria to order list
     private Set<Bee> bees = new TreeSet<>(new BeeComparator());;

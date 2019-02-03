@@ -47,7 +47,31 @@ public class Main {
         //getVsLoadDifference();
         //useHqlQuery();
         //useNativeSqlQuery();
-        useHibernateCriteria();
+        //useHibernateCriteria();
+        useNamedQueries();
+    }
+
+    private static void useNamedQueries() {
+        Session session = HibernateSessionFactoryWithXml.getInstance().openSession();
+        Transaction tx = session.beginTransaction();
+        Query query = session.getNamedQuery("HQL_GET_ALL_HONEY");
+        List<Honey> honeyList = query.list();
+        for (Honey h: honeyList){
+            System.out.println("Honey name: " + h.getName() + ", " + h.getBees());
+        }
+
+        query = session.getNamedQuery("@SQL_GET_ALL_BEES");
+
+        List<Object[]> rows = query.list();
+        System.out.println("list of bees");
+        System.out.println("----------------------");
+        for (Object[] row : rows) {
+            System.out.println(row[0] + "   " + row[1]);
+        }
+
+        tx.commit();
+        session.close();
+        HibernateSessionFactoryWithXml.getInstance().close();
     }
 
     private static void useHibernateCriteria() {
