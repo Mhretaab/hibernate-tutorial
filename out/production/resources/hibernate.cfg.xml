@@ -1,0 +1,50 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <!-- postgre SQL configuration-->
+        <property name="connection.url">
+            jdbc:postgresql://localhost:5432/learninghibernate
+        </property>
+        <property name="connection.username">learninghibernate</property>
+        <property name="connection.password">learninghibernate</property>
+        <property name="connection.driver_class">
+            org.postgresql.Driver
+        </property>
+
+        <property name="dialect">
+            org.hibernate.dialect.PostgreSQL82Dialect
+        </property>
+        <property name="cache.provider_class">
+            org.hibernate.cache.internal.NoCachingRegionFactory
+        </property>
+
+        <!-- Connection Pool Size -->
+        <!--<property name="hibernate.connection.pool_size">1</property>-->
+
+        <!-- org.hibernate.HibernateException: No CurrentSessionContext configured! -->
+        <property name="hibernate.current_session_context_class">thread</property>
+
+        <!--for test and development env-->
+        <property name="hibernate.show_sql">true</property>
+
+        <!--create the table schema when the configuration is initialized-->
+        <property name="hibernate.hbm2ddl.auto">update</property>
+
+        <!-- dbcp connection pool configuration -->
+        <property name="hibernate.dbcp.initialSize">5</property>
+        <property name="hibernate.dbcp.maxTotal">20</property>
+        <property name="hibernate.dbcp.maxIdle">10</property>
+        <property name="hibernate.dbcp.minIdle">5</property>
+        <property name="hibernate.dbcp.maxWaitMillis">-1</property>
+
+        <!--class to table mapping-->
+        <mapping class="com.tutorial.hibernate.models.Honey" />
+        <mapping class="com.tutorial.hibernate.models.Bee" />
+
+        <!-- mapping file, we can use Bean annotations too -->
+        <!--<mapping resource="honey.hbm.xml"/>-->
+    </session-factory>
+</hibernate-configuration>
