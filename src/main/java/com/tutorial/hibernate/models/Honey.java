@@ -27,7 +27,7 @@ public class Honey implements Serializable {
     @OneToMany(cascade = {javax.persistence.CascadeType.PERSIST, javax.persistence.CascadeType.MERGE}, orphanRemoval = true)//(mappedBy="honey")
     @Cascade({CascadeType.SAVE_UPDATE})
     @JoinColumn(name = "honey_id")
-    @SortComparator(BeeComparator.class)
+    @SortComparator(BeeComparator.class)//not recommended for large set of data rather use hibernate criteria to order list
     private Set<Bee> bees = new TreeSet<>(new BeeComparator());;
 
     public Honey() {//mandatory

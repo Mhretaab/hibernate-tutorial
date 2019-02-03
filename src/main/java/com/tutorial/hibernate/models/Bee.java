@@ -9,7 +9,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "bee", uniqueConstraints={@UniqueConstraint(columnNames={"id"})})
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY, region = "honey")
+//@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_ONLY, region = "honey")
 public class Bee implements Serializable {
     private static final long serialVersionUID = -8644055749514146694L;
     @Id

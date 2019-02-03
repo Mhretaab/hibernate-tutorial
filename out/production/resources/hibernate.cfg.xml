@@ -21,10 +21,21 @@
             org.hibernate.cache.internal.NoCachingRegionFactory
         </property>
 
+        <!--second level cache configuration
+        <property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.EhCacheRegionFactory</property>
+
+        &lt;!&ndash; For singleton factory &ndash;&gt;
+        &lt;!&ndash; <property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory</property>
+        &ndash;&gt;
+        &lt;!&ndash; enable second level cache and query cache &ndash;&gt;
+        <property name="hibernate.cache.use_second_level_cache">true</property>
+        <property name="hibernate.cache.use_query_cache">true</property>
+        <property name="net.sf.ehcache.configurationResourceName">/myehcache.xml</property>-->
+
         <!-- Connection Pool Size -->
         <!--<property name="hibernate.connection.pool_size">1</property>-->
 
-        <!-- org.hibernate.HibernateException: No CurrentSessionContext configured! -->
+        <!--CurrentSessionContext configured! -->
         <property name="hibernate.current_session_context_class">thread</property>
 
         <!--for test and development env-->

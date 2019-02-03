@@ -6,9 +6,9 @@ import com.tutorial.hibernate.utils.EntityManagerFactoryWithJava;
 import com.tutorial.hibernate.utils.HibernateSessionFactoryWithJava;
 import com.tutorial.hibernate.utils.HibernateSessionFactoryWithXml;
 import com.tutorial.hibernate.utils.EntityManagerFactoryWithXml;
-import org.hibernate.Hibernate;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.*;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,21 +44,121 @@ public class Main {
 
         //createHoneyWithCurrentSession();
         //createHoneyBeeRelation();
-        getVsLoadDifference();
+        //getVsLoadDifference();
+        //useHqlQuery();
+        //useNativeSqlQuery();
+        useHibernateCriteria();
+    }
+
+    private static void useHibernateCriteria() {
+        Session sess = HibernateSessionFactoryWithXml.getInstance().openSession();
+        Transaction tx = sess.beginTransaction();
+
+        Criteria criteria = sess.createCriteria(Honey.class);
+        List<Honey> honeyList = criteria.list();
+
+        for (Honey h : honeyList) {
+            System.out.println(h.getName() + " " + h.getBees());
+        }
+
+        criteria.add(Restrictions.eq("id", new Integer(300)));
+        Honey tigHoney = (Honey) criteria.uniqueResult();
+        System.out.println("unique result with restrictions");
+        System.out.println(tigHoney.getName() + " " + tigHoney.getBees());
+
+        System.out.println("order limit and offset");
+        List<Honey> hns = sess.createCriteria(Honey.class)
+                .addOrder(Order.desc("name"))
+                .setFirstResult(0)
+                .setMaxResults(2).list();
+
+        int count = 0;
+        for(Honey h: hns){
+            System.out.println(count + ": " + h.getName() + " " + h.getBees());
+            count++;
+        }
+
+        tx.commit();
+        sess.close();
+        HibernateSessionFactoryWithXml.getInstance().close();
+    }
+
+    private static void useNativeSqlQuery() {
+        Session sess = HibernateSessionFactoryWithXml.getInstance().openSession();
+        Transaction tx = sess.beginTransaction();
+
+        SQLQuery query = sess.createSQLQuery("SELECT h.name AS honey_name, b.name AS bee_name FROM honey AS h JOIN bee AS b ON h.id = b.honey_id");
+
+        List<Object[]> rows = query.list();
+        System.out.println("Honey Name  Bee Name");
+        System.out.println("----------------------");
+        for (Object[] row : rows) {
+            System.out.println(row[0] + "   " + row[1]);
+        }
+
+        tx.commit();
+        sess.close();
+        HibernateSessionFactoryWithXml.getInstance().close();
+    }
+
+    private static void useHqlQuery() {
+        Session sessOne = HibernateSessionFactoryWithXml.getInstance().openSession();
+        Transaction txOne = sessOne.beginTransaction();
+        Query query = sessOne.createQuery("SELECT h FROM Honey AS h");
+        List<Honey> honeyList = query.list();
+        System.out.println("printing list of honey");
+        for (Honey h : honeyList) {
+            System.out.println("Honey name: " + h.getName());
+            System.out.println("List of Bees" + h.getBees());
+        }
+
+        query = sessOne.createQuery("SELECT h FROM Honey AS h WHERE h.id = :id");
+        query.setInteger("id", 250);
+        Honey h = (Honey) query.uniqueResult();
+        System.out.println("printing unique honey");
+        System.out.println("Honey name: " + h.getName());
+        System.out.println("List of Bees: " + h.getBees());
+
+        System.out.println("printing with offset and limit");
+        query = sessOne.createQuery("FROM Honey");
+        query.setFirstResult(1);
+        query.setFetchSize(1);
+        List<Honey> honeys = query.list();
+        for (Honey o : honeys) {
+            System.out.println("Honey id: " + o.getId());
+            System.out.println("Honey name: " + o.getName());
+            System.out.println("List of Bees" + o.getBees());
+        }
+        System.out.println("printing honey update");
+        query = sessOne.createQuery("UPDATE Honey AS h SET h.name = :name WHERE h.id = :id");
+        query.setParameter("name", "Tig Honey");
+        query.setLong("id", 300);
+        int result = query.executeUpdate();
+        System.out.println("Honey Update Status=" + result);
+
+        System.out.println("printing bee deleting");
+        query = sessOne.createQuery("DELETE Bee AS b WHERE b.id=:id");
+        query.setInteger("id", 201);
+        result = query.executeUpdate();
+        System.out.println("Bee Delete Status=" + result);
+
+        txOne.commit();
+        sessOne.close();
+        HibernateSessionFactoryWithXml.getInstance().close();
     }
 
     private static void getVsLoadDifference() {
         Session session = HibernateSessionFactoryWithXml.getInstance().openSession();
         Transaction tx = session.beginTransaction();
-        Honey h = (Honey)session.get(Honey.class, new Integer(250));
+        Honey h = (Honey) session.get(Honey.class, new Integer(250));
         System.out.println(h.getName());
         //Set<Bee> bees = h.getBees();
-        for(Bee b:h.getBees()){
+        for (Bee b : h.getBees()) {
             System.out.println("bee name: " + b.getName());
         }
 
-        Honey a = (Honey)session.load(Honey.class, new Integer(250));//returns proxy  object for lazy initialization
-        for(Bee b:a.getBees()){
+        Honey a = (Honey) session.load(Honey.class, new Integer(250));//returns proxy  object for lazy initialization
+        for (Bee b : a.getBees()) {
             System.out.println("bee name: " + b.getName());
         }
 
@@ -74,11 +174,11 @@ public class Main {
         Bee b = new Bee();
         Bee a = new Bee();
 
-        honey.setName("Oromiya Honey");
-        honey.setTaste("Awesome");
+        honey.setName("Amhara Honey");
+        honey.setTaste("Wow");
 
-        b.setName("Jungle bee");
-        a.setName("Forest bee");
+        b.setName("Amhara Jungle bee");
+        a.setName("Amhara Forest bee");
 
         honey.getBees().add(b);
         honey.getBees().add(a);
@@ -121,7 +221,7 @@ public class Main {
         EntityManagerFactoryWithXml.close();
     }
 
-    private static void createBeeWithEntityManager(){
+    private static void createBeeWithEntityManager() {
         Honey honey = new Honey();
         honey.setName("Another Forest honey");
         honey.setTaste("So amazing taste");
@@ -143,12 +243,12 @@ public class Main {
         EntityManagerFactoryWithXml.close();
     }
 
-    private static void entityManagerQuery(){
+    private static void entityManagerQuery() {
         EntityManager entityManager = EntityManagerFactoryWithXml.getEntityManager();
         entityManager.getTransaction().begin();
         Honey honey = entityManager.find(Honey.class, 50);
         Set<Bee> bees = honey.getBees();
-        for (Bee b:bees) {
+        for (Bee b : bees) {
             System.out.println("bee name: " + b.getName());
         }
         entityManager.getTransaction().commit();
@@ -186,7 +286,7 @@ public class Main {
         return forestHoney;
     }
 
-    private static void createRelation(){
+    private static void createRelation() {
         Session session = HibernateSessionFactoryWithXml.getInstance().openSession();
 
         Transaction tx = session.beginTransaction();
@@ -229,7 +329,7 @@ public class Main {
         Session session = HibernateSessionFactoryWithXml.getInstance().openSession();
         Transaction tx = session.beginTransaction();
         List honeys = session.createQuery("select h from Honey as h").list();
-        for (Iterator iter = honeys.iterator(); iter.hasNext();) {
+        for (Iterator iter = honeys.iterator(); iter.hasNext(); ) {
             Honey element = (Honey) iter.next();
             Hibernate.initialize(element.getBees());
             logger.debug(element.toString());
